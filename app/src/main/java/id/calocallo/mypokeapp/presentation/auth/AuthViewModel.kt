@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import id.calocallo.mypokeapp.domain.usecase.CheckLoginStatusUseCase
 import id.calocallo.mypokeapp.domain.usecase.GetCurrentUserUseCase
 import id.calocallo.mypokeapp.domain.usecase.LoginUseCase
+import id.calocallo.mypokeapp.domain.usecase.LogoutUseCase
 import id.calocallo.mypokeapp.domain.usecase.RegisterUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,8 @@ class AuthViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val checkLoginStatusUseCase: CheckLoginStatusUseCase
+    private val checkLoginStatusUseCase: CheckLoginStatusUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -101,6 +103,13 @@ class AuthViewModel @Inject constructor(
 
     fun setLoggedIn() {
         _isLoggedIn.value = true
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            logoutUseCase()
+            _isLoggedIn.value = false
+        }
     }
 
 }

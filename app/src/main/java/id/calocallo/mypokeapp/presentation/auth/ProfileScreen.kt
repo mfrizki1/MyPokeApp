@@ -31,7 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun ProfileScreen(
-    //onLogout: () -> Unit,
+    onLogout: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val currentUser by viewModel.currentUser.collectAsState()
@@ -90,9 +90,7 @@ fun ProfileScreen(
             // Logout Button
             Button(
                 onClick = {
-                    // viewModel.logout()
-                    // onLogout()
-                    Log.e("xxx", "ProfileScreen: logour", )
+                    onLogout()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(

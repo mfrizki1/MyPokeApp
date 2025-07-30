@@ -25,20 +25,10 @@ import id.calocallo.mypokeapp.presentation.auth.ProfileScreen
 
 @Composable
 fun MainNavigation(
+    onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = "home"
-    ) {
-        composable("home") {
-            // Home
-        }
-
-        composable("profile") {
-            ProfileScreen()
-        }
-    }
+    
 
     // Bottom Navigation Bar
     Scaffold(
@@ -92,7 +82,7 @@ fun MainNavigation(
                 }
 
                 composable("profile") {
-                    ProfileScreen()
+                    ProfileScreen(onLogout = onLogout)
                 }
 
             }

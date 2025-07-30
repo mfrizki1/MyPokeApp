@@ -1,6 +1,5 @@
 package id.calocallo.mypokeapp.presentation
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,7 +24,7 @@ fun MyPokeApp() {
         color = MaterialTheme.colorScheme.background
     ) {
         if (isLoggedIn) {
-            MainNavigation()
+            MainNavigation(onLogout = { authViewModel.logout() })
         } else {
             AuthNavigation(
                 navController = authNavController,
