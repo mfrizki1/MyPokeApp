@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -17,18 +16,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import id.calocallo.mypokeapp.presentation.auth.ProfileScreen
+import androidx.navigation.navArgument
+import id.calocallo.mypokeapp.presentation.home.HomeScreen
+import id.calocallo.mypokeapp.presentation.home.ProfileScreen
 
 @Composable
 fun MainNavigation(
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
-    
+
 
     // Bottom Navigation Bar
     Scaffold(
@@ -61,30 +62,31 @@ fun MainNavigation(
                 startDestination = "home"
             ) {
                 composable("home") {
-                    // Temporary home screen placeholder
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Pokemon Home",
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                        Text(
-                            text = "Coming soon...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    HomeScreen(
+                        onPokemonClick = { pokemonName ->
+                            navController.navigate("pokemon_detail/$pokemonName")
+                        }
+                    )
                 }
 
                 composable("profile") {
                     ProfileScreen(onLogout = onLogout)
                 }
 
+                composable(
+                    "pokemon_detail/{pokemonName}",
+                    arguments = listOf(navArgument("pokemonName") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val pokemonName = backStackEntry.arguments?.getString("pokemonName")
+                    // You can create a PokemonDetailScreen composable to display the details
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "Pokemon Detail Screen for $pokemonName")
+                    }
+                }
             }
         }
     }
