@@ -16,7 +16,11 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
-        val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    private var currentOffset = 0
+    private val limit = 10
+
     init {
         loadPokemons()
     }
@@ -28,13 +32,14 @@ class HomeViewModel @Inject constructor(
                 errorMessage = null
             )
 
-            getPokemonUseCase().fold(
+            getPokemonUseCase(offset = 0, limit = limit).fold(
                 onSuccess = { pokemons ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         pokemons = pokemons,
                         isSuccess = true
                     )
+                    currentOffset = pokemons.size
                 },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
@@ -42,7 +47,32 @@ class HomeViewModel @Inject constructor(
                         errorMessage = error.message,
                     )
                 }
+            )
+        }
+    }
 
+    fun loadMorePokemons() {
+        if (_uiState.value.isLoading) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            getPokemonUseCase(offset = currentOffset, limit = limit).fold(
+                onSuccess = { newPokemons ->
+                    val currentPokemons = _uiState.value.pokemons
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        pokemons = currentPokemons + newPokemons,
+                        isSuccess = true
+                    )
+                    currentOffset += newPokemons.size
+                },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = error.message
+                    )
+                }
             )
         }
     }
