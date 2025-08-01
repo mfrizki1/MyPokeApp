@@ -4,4 +4,5 @@ import id.calocallo.mypokeapp.domain.entity.Pokemon
 
 interface PokemonRepository {
     suspend fun getPokemons(offset:Int, limit:Int): Result<List<Pokemon>>
+    suspend fun getPokemonDetail(name: String): Result<Pokemon>
 }

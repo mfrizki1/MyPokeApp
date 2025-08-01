@@ -24,4 +24,21 @@ class PokemonRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getPokemonDetail(name: String): Result<Pokemon> {
+        return try {
+            val response = pokemonService.getPokemonDetail(name)
+            val pokemon = Pokemon(
+                name = response.name,
+                abilities = response.abilities.map {
+                    Pokemon.Ability(
+                        ability = Pokemon.Ability.AbilityDetail(it.ability.name)
+                    )
+                }
+            )
+            Result.success(pokemon)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

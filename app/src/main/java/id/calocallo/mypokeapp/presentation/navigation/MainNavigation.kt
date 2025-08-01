@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import id.calocallo.mypokeapp.presentation.detail.PokemonDetailScreen
 import id.calocallo.mypokeapp.presentation.home.HomeScreen
 import id.calocallo.mypokeapp.presentation.home.ProfileScreen
 
@@ -78,13 +79,8 @@ fun MainNavigation(
                     arguments = listOf(navArgument("pokemonName") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val pokemonName = backStackEntry.arguments?.getString("pokemonName")
-                    // You can create a PokemonDetailScreen composable to display the details
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(text = "Pokemon Detail Screen for $pokemonName")
+                    if (pokemonName != null) {
+                        PokemonDetailScreen(pokemonName = pokemonName)
                     }
                 }
             }
