@@ -6,5 +6,6 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val pokemons: List<Pokemon> = emptyList(),
+    val searchQuery: String = "",
     val errorMessage: String? = null
 )

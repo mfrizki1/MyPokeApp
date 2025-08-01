@@ -3,6 +3,7 @@ package id.calocallo.mypokeapp.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import id.calocallo.mypokeapp.domain.entity.Pokemon
 import id.calocallo.mypokeapp.domain.usecase.GetPokemonUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,7 @@ class HomeViewModel @Inject constructor(
 
     private var currentOffset = 0
     private val limit = 10
+    private var _pokemons = listOf<Pokemon>()
 
     init {
         loadPokemons()
@@ -34,6 +36,7 @@ class HomeViewModel @Inject constructor(
 
             getPokemonUseCase(offset = 0, limit = limit).fold(
                 onSuccess = { pokemons ->
+                    _pokemons = pokemons
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         pokemons = pokemons,
@@ -52,7 +55,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun loadMorePokemons() {
-        if (_uiState.value.isLoading) return
+        if (_uiState.value.isLoading || _uiState.value.searchQuery.isNotEmpty()) return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
@@ -60,6 +63,7 @@ class HomeViewModel @Inject constructor(
             getPokemonUseCase(offset = currentOffset, limit = limit).fold(
                 onSuccess = { newPokemons ->
                     val currentPokemons = _uiState.value.pokemons
+                    _pokemons = _pokemons + newPokemons
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         pokemons = currentPokemons + newPokemons,
@@ -75,5 +79,17 @@ class HomeViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+        val filteredPokemon = if (query.isBlank()) {
+            _pokemons
+        } else {
+            _pokemons.filter {
+                it.name.contains(query, ignoreCase = true)
+            }
+        }
+        _uiState.value = _uiState.value.copy(pokemons = filteredPokemon)
     }
 }
