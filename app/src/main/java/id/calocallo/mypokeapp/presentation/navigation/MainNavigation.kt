@@ -1,9 +1,6 @@
 package id.calocallo.mypokeapp.presentation.navigation
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -14,11 +11,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import id.calocallo.mypokeapp.presentation.detail.PokemonDetailScreen
@@ -30,28 +30,38 @@ fun MainNavigation(
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-
-    // Bottom Navigation Bar
     Scaffold(
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
                     label = { Text("Home") },
-                    selected = navController.currentDestination?.route == "home",
+                    selected = currentDestination?.hierarchy?.any { it.route == "home" } == true,
                     onClick = {
                         navController.navigate("home") {
-                            popUpTo("home") { inclusive = true }
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
-                    selected = navController.currentDestination?.route == "profile",
+                    selected = currentDestination?.hierarchy?.any { it.route == "profile" } == true,
                     onClick = {
-                        navController.navigate("profile")
+                        navController.navigate("profile") {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }
